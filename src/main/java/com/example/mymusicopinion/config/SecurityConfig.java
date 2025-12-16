@@ -28,7 +28,8 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         // 비밀번호 암호화에 사용할 인코더를 BCrypt로 지정
-        // BCrypt 해싱 함수(BCrypt hashing function)를 사용해서 비밀번호를 인코딩해주는 메서드와 사용자의 의해 제출된 비밀번호와
+        // BCrypt 해싱 함수(BCrypt hashing function)를 사용해서 비밀번호를 인코딩해주는 메서드와 사용자의 의해 제출된
+        // 비밀번호와
         // 저장소에 저장되어 있는 비밀번호의 일치 여부를 확인해주는 메서드를 제공
         return new BCryptPasswordEncoder();
     }
@@ -50,13 +51,13 @@ public class SecurityConfig {
                 .requestMatchers(PathRequest.toH2Console()).permitAll()
                 // 회원가입, 로그인 API는 인증 없이 접근 허용
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/view/auth/**", "songs/view").permitAll()
+                .requestMatchers("/view/auth/**", "/songs/view").permitAll()
                 // GET 요청 중에서 '/songs' 나 '/board' 로 시작하는 API는 인증
                 .requestMatchers(HttpMethod.GET, "/songs/**", "/board/**").permitAll()
-                .anyRequest().authenticated()
-        );
+                .anyRequest().authenticated());
 
-        http.addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userRepository), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userRepository),
+                UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
 
