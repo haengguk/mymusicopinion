@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" th:fragment="navbar">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/songs/view}">My Music Opinion</a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item" id="login-link" style="display: none;">
+                    <a class="nav-link" th:href="@{/view/auth/login}">로그인</a>
+                </li>
+                <li class="nav-item" id="signup-link" style="display: none;">
+                    <a class="nav-link" th:href="@{/view/auth/signup}">회원가입</a>
+                </li>
+                <li class="nav-item" id="logout-link" style="display: none;">
+                    <a class="nav-link" href="#" id="logout-button">로그아웃</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<script th:fragment="navbar-script">
+    document.addEventListener("DOMContentLoaded", function() {
+        // 브라우저의 localStorage에서 JWT 토큰을 가져옵니다.
+        const token = localStorage.getItem('jwt-token');
+
+        const loginLink = document.getElementById('login-link');
+        const signupLink = document.getElementById('signup-link');
+        const logoutLink = document.getElementById('logout-link');
+
+        if (token) {
+            // 토큰이 있으면(로그인 상태), 로그아웃 버튼을 보여줍니다.
+            logoutLink.style.display = 'block';
+        } else {
+            // 토큰이 없으면(비로그인 상태), 로그인과 회원가입 버튼을 보여줍니다.
+            loginLink.style.display = 'block';
+            signupLink.style.display = 'block';
+        }
+
+        // 로그아웃 버튼에 클릭 이벤트 추가
+        const logoutButton = document.getElementById('logout-button');
+        if (logoutButton) {
+            logoutButton.addEventListener('click', function (event) {
+                event.preventDefault(); // a 태그의 기본 동작을 막음
+
+                // localStorage에서 토큰을 제거합니다.
+                localStorage.removeItem('jwt-token');
+
+                alert('로그아웃 되었습니다.');
+                window.location.href = '/view/auth/login'; // 로그인 페이지로 리다이렉트
+            });
+        }
+    });
+</script>
+
+</body>
+</html>

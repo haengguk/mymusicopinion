@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>노래 등록</title>
+    <!-- ✅ 부트스트랩 CDN 링크 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-..." crossorigin="anonymous">
+</head>
+<body class="container mt-5">
+<h1 class="mb-4">노래 등록하기</h1>
+<form th:action="@{/songs/new}" th:object="${songRequestDto}" method="post">
+    <div class="mb-3">
+        <label class="form-label">제목</label>
+        <input type="text" th:field="*{title}" class="form-control">
+        <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">아티스트</label>
+        <input type="text" th:field="*{artist}" class="form-control">
+        <div th:if="${#fields.hasErrors('artist')}" th:errors="*{artist}"></div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">발매연도</label>
+        <input type="number" th:field="*{releaseYear}" class="form-control">
+        <div th:if="${#fields.hasErrors('releaseYear')}" th:errors="*{releaseYear}"></div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">장르</label>
+        <input type="text" th:field="*{genre}" class="form-control">
+        <div th:if="${#fields.hasErrors('genre')}" th:errors="*{genre}"></div>
+    </div>
+    <div class="mt-4 text-end">
+        <button class="btn btn-primary" type="submit">등록하기</button>
+    </div>
+</form>
+</body>
+</html>
