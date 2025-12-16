@@ -1,9 +1,18 @@
 package com.example.mymusicopinion.services;
 
+import com.example.mymusicopinion.dto.ReviewRequestDto;
 import com.example.mymusicopinion.dto.SongRequestDto;
+import com.example.mymusicopinion.dto.SongStatusResponseDto;
 import com.example.mymusicopinion.exceptions.BadRequestException;
 import com.example.mymusicopinion.exceptions.ResourceNotFoundException;
+import com.example.mymusicopinion.models.Favorite;
+import com.example.mymusicopinion.models.Review;
 import com.example.mymusicopinion.models.Song;
+import com.example.mymusicopinion.models.SongLike;
+import com.example.mymusicopinion.models.User;
+import com.example.mymusicopinion.repositories.FavoriteRepository;
+import com.example.mymusicopinion.repositories.ReviewRepository;
+import com.example.mymusicopinion.repositories.SongLikeRepository;
 import com.example.mymusicopinion.repositories.SongRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,22 +27,22 @@ import org.springframework.context.event.EventListener;
 @Service
 public class SongService {
     private final SongRepository songRepository;
-    private final com.example.mymusicopinion.repositories.SongLikeRepository songLikeRepository;
-    private final com.example.mymusicopinion.repositories.FavoriteRepository favoriteRepository;
-    private final com.example.mymusicopinion.repositories.ReviewRepository reviewRepository;
+    private final SongLikeRepository songLikeRepository;
+    private final FavoriteRepository favoriteRepository;
+    private final ReviewRepository reviewRepository;
 
     public SongService(
             SongRepository songRepository,
-            com.example.mymusicopinion.repositories.SongLikeRepository songLikeRepository,
-            com.example.mymusicopinion.repositories.FavoriteRepository favoriteRepository,
-            com.example.mymusicopinion.repositories.ReviewRepository reviewRepository) {
+            SongLikeRepository songLikeRepository,
+            FavoriteRepository favoriteRepository,
+            ReviewRepository reviewRepository) {
         this.songRepository = songRepository;
         this.songLikeRepository = songLikeRepository;
         this.favoriteRepository = favoriteRepository;
         this.reviewRepository = reviewRepository;
     }
 
-    public Song getOrCreateSong(com.example.mymusicopinion.dto.ReviewRequestDto dto) {
+    public Song getOrCreateSong(ReviewRequestDto dto) {
         return songRepository.findByItunesTrackId(dto.getItunesTrackId())
                 .orElseGet(() -> {
                     Song newSong = new Song();
@@ -124,41 +133,41 @@ public class SongService {
     }
 
     @org.springframework.transaction.annotation.Transactional
-    public void toggleSongLike(Long songId, com.example.mymusicopinion.models.User user) {
+    public void toggleSongLike(Long songId, User user) {
         Song song = getSongById(songId);
 
-        java.util.Optional<com.example.mymusicopinion.models.SongLike> existingLike = songLikeRepository
+        Optional<SongLike> existingLike = songLikeRepository
                 .findBySongAndUser(song, user);
 
         if (existingLike.isPresent()) {
             songLikeRepository.delete(existingLike.get());
             song.setLikeCount(Math.max(0, song.getLikeCount() - 1));
         } else {
-            songLikeRepository.save(new com.example.mymusicopinion.models.SongLike(user, song));
+            songLikeRepository.save(new SongLike(user, song));
             song.setLikeCount(song.getLikeCount() + 1);
         }
     }
 
     @org.springframework.transaction.annotation.Transactional
-    public void toggleFavorite(Long songId, com.example.mymusicopinion.models.User user) {
+    public void toggleFavorite(Long songId, User user) {
         Song song = getSongById(songId);
-        java.util.Optional<com.example.mymusicopinion.models.Favorite> existingFav = favoriteRepository
+        Optional<Favorite> existingFav = favoriteRepository
                 .findBySongAndUser(song, user);
 
         if (existingFav.isPresent()) {
             favoriteRepository.delete(existingFav.get());
         } else {
-            favoriteRepository.save(new com.example.mymusicopinion.models.Favorite(user, song));
+            favoriteRepository.save(new Favorite(user, song));
         }
     }
 
-    public com.example.mymusicopinion.dto.SongStatusResponseDto getSongStatus(Long songId,
-            com.example.mymusicopinion.models.User user) {
+    public SongStatusResponseDto getSongStatus(Long songId,
+            User user) {
         Song song = getSongById(songId);
         boolean liked = songLikeRepository.existsBySongAndUser(song, user);
         boolean favorited = favoriteRepository.existsBySongAndUser(song, user);
         boolean reviewed = reviewRepository.existsBySongIdAndUserId(songId, user.getId());
-        return new com.example.mymusicopinion.dto.SongStatusResponseDto(liked, favorited, reviewed);
+        return new SongStatusResponseDto(liked, favorited, reviewed);
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -173,11 +182,11 @@ public class SongService {
     @org.springframework.transaction.annotation.Transactional
     public void updateSongStats(Long songId) {
         Song song = getSongById(songId);
-        java.util.List<com.example.mymusicopinion.models.Review> reviews = reviewRepository.findBySongId(songId,
+        List<Review> reviews = reviewRepository.findBySongId(songId,
                 org.springframework.data.domain.Sort.unsorted());
 
         int count = reviews.size();
-        double avg = reviews.stream().mapToInt(com.example.mymusicopinion.models.Review::getRating).average()
+        double avg = reviews.stream().mapToInt(Review::getRating).average()
                 .orElse(0.0);
 
         // Round to 1 decimal place

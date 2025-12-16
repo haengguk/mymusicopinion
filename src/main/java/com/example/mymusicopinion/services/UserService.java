@@ -1,17 +1,18 @@
 package com.example.mymusicopinion.services;
 
 import com.example.mymusicopinion.config.JwtUtil;
+import com.example.mymusicopinion.dto.BoardResponseDto;
 import com.example.mymusicopinion.dto.LoginRequestDto;
+import com.example.mymusicopinion.dto.PostResponseDto;
+import com.example.mymusicopinion.dto.ReviewResponseDto;
 import com.example.mymusicopinion.dto.SignupRequestDto;
 import com.example.mymusicopinion.dto.UserResponseDto;
 import com.example.mymusicopinion.dto.UserUpdateRequestDto;
-import com.example.mymusicopinion.dto.ReviewResponseDto;
-import com.example.mymusicopinion.dto.PostResponseDto;
 import com.example.mymusicopinion.models.User;
-import com.example.mymusicopinion.repositories.UserRepository;
-import com.example.mymusicopinion.repositories.ReviewRepository;
-import com.example.mymusicopinion.repositories.PostRepository;
 import com.example.mymusicopinion.repositories.PostCommentRepository;
+import com.example.mymusicopinion.repositories.PostRepository;
+import com.example.mymusicopinion.repositories.ReviewRepository;
+import com.example.mymusicopinion.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -97,10 +98,10 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<com.example.mymusicopinion.dto.BoardResponseDto> getMyPosts(User user) {
+    public List<BoardResponseDto> getMyPosts(User user) {
         return postRepository.findByUserOrderByCreatedAtDesc(user).stream()
                 .map(post -> {
-                    com.example.mymusicopinion.dto.BoardResponseDto dto = com.example.mymusicopinion.dto.BoardResponseDto
+                    BoardResponseDto dto = BoardResponseDto
                             .from(post);
                     dto.setCommentCount(postCommentRepository.findByPostId(post.getId()).size());
                     return dto;

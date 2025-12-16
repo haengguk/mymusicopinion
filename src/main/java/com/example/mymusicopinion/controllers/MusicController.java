@@ -2,6 +2,7 @@ package com.example.mymusicopinion.controllers;
 
 import com.example.mymusicopinion.dto.ItunesResponseDto;
 import com.example.mymusicopinion.services.MusicSearchService;
+import com.example.mymusicopinion.services.YoutubeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,10 +13,10 @@ import java.util.List;
 public class MusicController {
 
     private final MusicSearchService musicSearchService;
-    private final com.example.mymusicopinion.services.YoutubeService youtubeService;
+    private final YoutubeService youtubeService;
 
     public MusicController(MusicSearchService musicSearchService,
-            com.example.mymusicopinion.services.YoutubeService youtubeService) {
+            YoutubeService youtubeService) {
         this.musicSearchService = musicSearchService;
         this.youtubeService = youtubeService;
     }

@@ -1,9 +1,13 @@
 package com.example.mymusicopinion.services;
 
 import com.example.mymusicopinion.dto.ReviewRequestDto;
+import com.example.mymusicopinion.dto.ReviewResponseDto;
 import com.example.mymusicopinion.exceptions.ResourceNotFoundException;
 import com.example.mymusicopinion.models.Review;
+import com.example.mymusicopinion.models.ReviewLike;
 import com.example.mymusicopinion.models.Song;
+import com.example.mymusicopinion.models.User;
+import com.example.mymusicopinion.repositories.ReviewLikeRepository;
 import com.example.mymusicopinion.repositories.ReviewRepository;
 import com.example.mymusicopinion.repositories.SongRepository;
 import org.springframework.data.domain.Page;
@@ -19,18 +23,18 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final SongService songService;
-    private final com.example.mymusicopinion.repositories.ReviewLikeRepository reviewLikeRepository;
+    private final ReviewLikeRepository reviewLikeRepository;
 
     // 생성자를 통한 의존성 주입방식
     public ReviewService(ReviewRepository reviewRepository, SongService songService,
-            com.example.mymusicopinion.repositories.ReviewLikeRepository reviewLikeRepository) {
+            ReviewLikeRepository reviewLikeRepository) {
         this.reviewRepository = reviewRepository;
         this.songService = songService;
         this.reviewLikeRepository = reviewLikeRepository;
     }
 
     @Transactional
-    public Review addReview(ReviewRequestDto reviewRequestDto, com.example.mymusicopinion.models.User user) {
+    public Review addReview(ReviewRequestDto reviewRequestDto, User user) {
         // Find or create the song based on iTunes ID
         // Note: SongService instance is injecting from constructor
         // We need to make sure SongService has the method. Assuming previous step did
@@ -57,7 +61,7 @@ public class ReviewService {
         return savedReview;
     }
 
-    public List<com.example.mymusicopinion.dto.ReviewResponseDto> getReviewBySong(Long songId, String sort) {
+    public List<ReviewResponseDto> getReviewBySong(Long songId, String sort) {
         org.springframework.data.domain.Sort sortObj = org.springframework.data.domain.Sort
                 .by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt");
 
@@ -68,7 +72,7 @@ public class ReviewService {
 
         return reviewRepository.findBySongId(songId, sortObj)
                 .stream()
-                .map(com.example.mymusicopinion.dto.ReviewResponseDto::from)
+                .map(ReviewResponseDto::from)
                 .toList();
     }
 
@@ -98,18 +102,18 @@ public class ReviewService {
     }
 
     @Transactional
-    public void toggleReviewLike(Long reviewId, com.example.mymusicopinion.models.User user) {
+    public void toggleReviewLike(Long reviewId, User user) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ResourceNotFoundException("해당 리뷰가 없습니다"));
 
-        java.util.Optional<com.example.mymusicopinion.models.ReviewLike> existingLike = reviewLikeRepository
+        java.util.Optional<ReviewLike> existingLike = reviewLikeRepository
                 .findByReviewAndUser(review, user);
 
         if (existingLike.isPresent()) {
             reviewLikeRepository.delete(existingLike.get());
             review.setLikeCount(Math.max(0, review.getLikeCount() - 1));
         } else {
-            reviewLikeRepository.save(new com.example.mymusicopinion.models.ReviewLike(user, review));
+            reviewLikeRepository.save(new ReviewLike(user, review));
             review.setLikeCount(review.getLikeCount() + 1);
         }
     }

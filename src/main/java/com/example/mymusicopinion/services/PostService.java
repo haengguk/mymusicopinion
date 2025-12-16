@@ -1,10 +1,15 @@
 package com.example.mymusicopinion.services;
 
 import com.example.mymusicopinion.dto.PostRequestDto;
+import com.example.mymusicopinion.dto.PostResponseDto;
 import com.example.mymusicopinion.exceptions.ResourceNotFoundException;
 import com.example.mymusicopinion.models.Post;
+import com.example.mymusicopinion.models.PostLike;
+import com.example.mymusicopinion.models.Song;
 import com.example.mymusicopinion.models.User;
+import com.example.mymusicopinion.repositories.PostLikeRepository;
 import com.example.mymusicopinion.repositories.PostRepository;
+import com.example.mymusicopinion.repositories.SongRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,12 +20,12 @@ import java.time.LocalDateTime;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final com.example.mymusicopinion.repositories.SongRepository songRepository;
-    private final com.example.mymusicopinion.repositories.PostLikeRepository postLikeRepository;
+    private final SongRepository songRepository;
+    private final PostLikeRepository postLikeRepository;
 
     public PostService(PostRepository postRepository,
-            com.example.mymusicopinion.repositories.SongRepository songRepository,
-            com.example.mymusicopinion.repositories.PostLikeRepository postLikeRepository) {
+            SongRepository songRepository,
+            PostLikeRepository postLikeRepository) {
         this.postRepository = postRepository;
         this.songRepository = songRepository;
         this.postLikeRepository = postLikeRepository;
@@ -29,14 +34,14 @@ public class PostService {
     @org.springframework.transaction.annotation.Transactional
     public void togglePostLike(Long postId, User user) {
         Post post = getPostById(postId);
-        java.util.Optional<com.example.mymusicopinion.models.PostLike> existingLike = postLikeRepository
+        java.util.Optional<PostLike> existingLike = postLikeRepository
                 .findByUserAndPost(user, post);
 
         if (existingLike.isPresent()) {
             postLikeRepository.delete(existingLike.get());
             post.setLikeCount(Math.max(0, post.getLikeCount() - 1));
         } else {
-            postLikeRepository.save(new com.example.mymusicopinion.models.PostLike(user, post));
+            postLikeRepository.save(new PostLike(user, post));
             post.setLikeCount(post.getLikeCount() + 1);
         }
     }
@@ -51,10 +56,10 @@ public class PostService {
 
         // Handle Song Recommendation
         if ("RECOMMEND".equals(post.getCategory()) && requestDto.getItunesTrackId() != null) {
-            com.example.mymusicopinion.models.Song song = songRepository
+            Song song = songRepository
                     .findByItunesTrackId(requestDto.getItunesTrackId())
                     .orElseGet(() -> {
-                        com.example.mymusicopinion.models.Song newSong = new com.example.mymusicopinion.models.Song();
+                        Song newSong = new Song();
                         newSong.setItunesTrackId(requestDto.getItunesTrackId());
                         newSong.setTitle(requestDto.getSongTitle());
                         newSong.setArtist(requestDto.getSongArtist());
@@ -67,13 +72,13 @@ public class PostService {
         return postRepository.save(post);
     }
 
-    public Page<com.example.mymusicopinion.dto.PostResponseDto> getAllPosts(Pageable pageable) {
-        return postRepository.findAll(pageable).map(com.example.mymusicopinion.dto.PostResponseDto::from);
+    public Page<PostResponseDto> getAllPosts(Pageable pageable) {
+        return postRepository.findAll(pageable).map(PostResponseDto::from);
     }
 
-    public Page<com.example.mymusicopinion.dto.PostResponseDto> getPostsByCategory(String category, Pageable pageable) {
+    public Page<PostResponseDto> getPostsByCategory(String category, Pageable pageable) {
         return postRepository.findByCategory(category, pageable)
-                .map(com.example.mymusicopinion.dto.PostResponseDto::from);
+                .map(PostResponseDto::from);
     }
 
     public Post getPostById(Long id) {

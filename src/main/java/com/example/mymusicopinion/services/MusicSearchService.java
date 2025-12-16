@@ -1,6 +1,8 @@
 package com.example.mymusicopinion.services;
 
 import com.example.mymusicopinion.dto.ItunesResponseDto;
+import com.example.mymusicopinion.models.Song;
+import com.example.mymusicopinion.repositories.SongRepository;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
@@ -14,10 +16,10 @@ import java.util.List;
 public class MusicSearchService {
 
     private final RestClient restClient;
-    private final com.example.mymusicopinion.repositories.SongRepository songRepository;
+    private final SongRepository songRepository;
 
     public MusicSearchService(RestClient.Builder builder,
-            com.example.mymusicopinion.repositories.SongRepository songRepository) {
+            SongRepository songRepository) {
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
         converter.setSupportedMediaTypes(
                 Arrays.asList(MediaType.APPLICATION_JSON, MediaType.valueOf("text/javascript")));
@@ -87,14 +89,14 @@ public class MusicSearchService {
                     .toList();
 
             if (!trackIds.isEmpty()) {
-                List<com.example.mymusicopinion.models.Song> dbSongs = songRepository.findByItunesTrackIdIn(trackIds);
-                java.util.Map<Long, com.example.mymusicopinion.models.Song> songMap = dbSongs.stream()
+                List<Song> dbSongs = songRepository.findByItunesTrackIdIn(trackIds);
+                java.util.Map<Long, Song> songMap = dbSongs.stream()
                         .collect(java.util.stream.Collectors
-                                .toMap(com.example.mymusicopinion.models.Song::getItunesTrackId, song -> song));
+                                .toMap(Song::getItunesTrackId, song -> song));
 
                 for (ItunesResponseDto.ItunesResultDto result : results) {
                     if (result.getTrackId() != null && songMap.containsKey(result.getTrackId())) {
-                        com.example.mymusicopinion.models.Song dbSong = songMap.get(result.getTrackId());
+                        Song dbSong = songMap.get(result.getTrackId());
                         result.setReviewCount(dbSong.getReviewCount());
                         result.setAverageRating(dbSong.getAverageRating());
                     }
