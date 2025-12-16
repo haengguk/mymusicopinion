@@ -7,9 +7,10 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
+@Entity
 @Getter
 @Setter
-@Entity
+@Table(name = "songs")
 public class Song {
 
     @Id
@@ -25,12 +26,12 @@ public class Song {
     private String imageUrl;
     private String genre;
     private int releaseYear;
-    @jakarta.persistence.Column(nullable = false, columnDefinition = "integer default 0")
+    @jakarta.persistence.Column(nullable = false)
     private int likeCount = 0;
 
-    @jakarta.persistence.Column(nullable = false, columnDefinition = "double default 0.0")
+    @jakarta.persistence.Column(nullable = false)
     private double averageRating = 0.0;
 
-    @jakarta.persistence.Column(nullable = false, columnDefinition = "integer default 0")
+    @jakarta.persistence.Column(nullable = false)
     private int reviewCount = 0;
 }

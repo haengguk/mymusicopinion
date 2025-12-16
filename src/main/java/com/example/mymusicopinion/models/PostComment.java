@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
+@Table(name = "post_comments")
 public class PostComment {
 
     @Id
@@ -26,6 +27,6 @@ public class PostComment {
     private String comment;
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(nullable = false, columnDefinition = "integer default 0")
+    @Column(nullable = false)
     private int likeCount = 0;
 }

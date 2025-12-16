@@ -7,6 +7,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
+@Table(name = "reviews")
 public class Review {
 
     @Id
@@ -26,6 +27,6 @@ public class Review {
 
     private java.time.LocalDateTime createdAt = java.time.LocalDateTime.now();
 
-    @Column(nullable = false, columnDefinition = "integer default 0")
+    @Column(nullable = false)
     private int likeCount = 0;
 }

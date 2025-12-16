@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
+@Table(name = "posts")
 public class Post {
 
     @Id
@@ -17,7 +18,7 @@ public class Post {
 
     private String title;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -32,7 +33,7 @@ public class Post {
     @JoinColumn(name = "song_id")
     private Song song;
 
-    @Column(nullable = false, columnDefinition = "integer default 0")
+    @Column(nullable = false)
     private int likeCount = 0;
 
     @org.hibernate.annotations.Formula("(select count(*) from post_comment pc where pc.post_id = id)")
