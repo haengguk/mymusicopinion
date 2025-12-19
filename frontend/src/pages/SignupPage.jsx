@@ -17,7 +17,7 @@ export default function SignupPage() {
         setError('')
 
         try {
-            await api.post('/auth/signup', formData)
+            await api.post('/api/auth/signup', formData)
             setSuccess(true)
             setTimeout(() => navigate('/login'), 2000)
         } catch (err) {
