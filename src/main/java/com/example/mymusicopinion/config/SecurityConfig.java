@@ -51,7 +51,7 @@ public class SecurityConfig {
                 .requestMatchers(PathRequest.toH2Console()).permitAll()
                 // 회원가입, 로그인 API는 인증 없이 접근 허용
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/view/auth/**", "/songs/view").permitAll()
+                .requestMatchers("/view/auth/**", "/songs/view", "/error").permitAll()
                 // GET 요청 중에서 '/songs' 나 '/board' 로 시작하는 API는 인증
                 .requestMatchers(HttpMethod.GET, "/songs/**", "/board/**").permitAll()
                 .anyRequest().authenticated());
