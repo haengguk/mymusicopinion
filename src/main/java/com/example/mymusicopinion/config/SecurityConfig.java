@@ -47,8 +47,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(authz -> authz
                 // 정적 리소스에 대한 요청 모두 허용
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                // 정적 리소스에 대한 요청 모두 허용
-                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+
                 // 회원가입, 로그인 API는 인증 없이 접근 허용
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/view/auth/**", "/songs/view", "/error").permitAll()
