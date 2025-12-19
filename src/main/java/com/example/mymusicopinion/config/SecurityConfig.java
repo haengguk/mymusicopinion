@@ -47,8 +47,8 @@ public class SecurityConfig {
         http.authorizeHttpRequests(authz -> authz
                 // 정적 리소스에 대한 요청 모두 허용
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                // H2 콘솔 관련 요청은 모두 허용 (개발용)
-                .requestMatchers(PathRequest.toH2Console()).permitAll()
+                // 정적 리소스에 대한 요청 모두 허용
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                 // 회원가입, 로그인 API는 인증 없이 접근 허용
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/view/auth/**", "/songs/view", "/error").permitAll()
