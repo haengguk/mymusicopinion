@@ -22,8 +22,25 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleAll(Exception ex) {
+        // 상세 에러 로그 기록 (실제 운영환경에서는 필수)
+        // e.g. log.error("Unexpected error", ex);
+
         ErrorResponse body = new ErrorResponse("INTERNAL_ERROR", "서버에 문제가 발생했습니다.");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+    }
+
+    @ExceptionHandler(org.springframework.web.HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleMethodNotSupported(
+            org.springframework.web.HttpRequestMethodNotSupportedException ex) {
+        ErrorResponse body = new ErrorResponse("METHOD_NOT_ALLOWED", "지원하지 않는 HTTP 메서드입니다.");
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(body);
+    }
+
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNoResourceFound(
+            org.springframework.web.servlet.resource.NoResourceFoundException ex) {
+        ErrorResponse body = new ErrorResponse("NOT_FOUND", "요청한 리소스를 찾을 수 없습니다.");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 
 }

@@ -36,6 +36,9 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        // CORS 설정 추가 (Security 필터 체인에서 가장 먼저 처리되도록)
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
+
         // CSRF(Cross-Site Request Forgery) 보호 비활성화 (JWT 사용 시 보통 비활성화)
         http.csrf(csrf -> csrf.disable());
 
@@ -60,5 +63,31 @@ public class SecurityConfig {
 
         return http.build();
 
+    }
+
+    @Bean
+    public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
+        org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
+
+        // 허용할 Origin 설정 (Vercel 배포 주소 + 로컬 개발용)
+        configuration.setAllowedOrigins(
+                java.util.Arrays.asList("https://mymusicopinion-fe.vercel.app", "http://localhost:3000",
+                        "http://localhost:5173", "http://localhost:5175"));
+
+        // 허용할 HTTP Method 설정
+        configuration.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+        // 허용할 Header 설정
+        configuration.setAllowedHeaders(java.util.Arrays.asList("*"));
+
+        // 자격 증명(Cookie, Authorization Header 등) 허용
+        configuration.setAllowCredentials(true);
+
+        // 노출할 헤더 설정 (JWT 사용 시 필요할 수 있음)
+        configuration.addExposedHeader("Authorization");
+
+        org.springframework.web.cors.UrlBasedCorsConfigurationSource source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
