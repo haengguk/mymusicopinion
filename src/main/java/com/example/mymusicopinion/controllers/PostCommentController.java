@@ -50,8 +50,8 @@ public class PostCommentController {
     public ResponseEntity<Page<PostCommentResponseDto>> getPagedPostComments(
             @PathVariable("postId") Long postId,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable) {
-        Page<PostComment> page = postCommentService.getCommentsByPostId(postId, pageable);
-        return ResponseEntity.ok(page.map(PostCommentResponseDto::from));
+        Page<PostCommentResponseDto> page = postCommentService.getCommentsByPostId(postId, pageable);
+        return ResponseEntity.ok(page);
     }
 
     @PutMapping("/{commentId}")

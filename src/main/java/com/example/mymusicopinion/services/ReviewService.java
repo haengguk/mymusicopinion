@@ -98,8 +98,8 @@ public class ReviewService {
         songService.updateSongStats(songId);
     }
 
-    public Page<Review> getReviewBySongId(Long songId, Pageable pageable) {
-        return reviewRepository.findBySongId(songId, pageable);
+    public Page<ReviewResponseDto> getReviewBySongId(Long songId, Pageable pageable) {
+        return reviewRepository.findBySongId(songId, pageable).map(ReviewResponseDto::from);
     }
 
     @Transactional

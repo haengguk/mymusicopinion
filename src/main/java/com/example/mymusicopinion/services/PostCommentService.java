@@ -72,10 +72,12 @@ public class PostCommentService {
         return postCommentRepository.findByPostId(postId);
     }
 
-    public Page<PostComment> getCommentsByPostId(Long postId, Pageable pageable) {
+    public Page<com.example.mymusicopinion.dto.PostCommentResponseDto> getCommentsByPostId(Long postId,
+            Pageable pageable) {
         postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("해당 게시물이 없습니다."));
-        return postCommentRepository.findByPostId(postId, pageable);
+        return postCommentRepository.findByPostId(postId, pageable)
+                .map(com.example.mymusicopinion.dto.PostCommentResponseDto::from);
     }
 
     @org.springframework.transaction.annotation.Transactional

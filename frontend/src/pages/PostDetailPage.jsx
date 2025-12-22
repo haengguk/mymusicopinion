@@ -52,13 +52,32 @@ export default function PostDetailPage() {
             alert("로그인이 필요합니다.")
             return
         }
+
+        // Optimistic Update
+        const previousPost = { ...post }
+        setPost(prev => ({
+            ...prev,
+            likeCount: prev.likeCount + 1 // 좋아요 취소 기능이 없다면 무조건 +1, 토글이라면 로직 필요. 백엔드는 토글임.
+            // 백엔드가 토글이므로 프론트엔드도 현재 상태(내가 좋아요 했는지)를 알아야 완벽한 낙관적 업데이트 가능.
+            // 하지만 현재 API 응답에 'liked' 여부가 없음. 일단 +1/-1 토글을 가정하거나, 
+            // 단순히 즉각적인 반응을 위해 "숫자만이라도 올리는 척" 할 수 있지만, 
+            // UX상 "토글"이므로 내가 이미 눌렀는지 모르면 +1 해야할지 -1 해야할지 모름.
+            // API에서 'liked' 필드를 안 내려주면 낙관적 업데이트가 불가능함.
+            // 하지만 사용자 요청은 "숫자가 늦게 올라간다"임.
+            // 차선책: API 호출 후 fetchPost() 대신, 성공했다고 가정하고 숫자만 올리기? 
+            // 아니면 그냥 로딩없이 바로 fetchPost() 결과 반영? (fetch가 빠르면 됨)
+            // 가장 좋은 방법: fetchPost를 백그라운드에서 하고, UI는 낙관적으로 처리.
+            // 여기서는 단순히 "반응성을 높여달라"는 것이므로, 
+            // 일단 +1 했다가 fetchPost 결과로 보정하는 전략 사용. (대부분 사용자는 좋아요를 누르니까)
+        }))
+
         try {
             await api.post(`/api/board/${postId}/like`)
-            // Optimistic Update or Refetch
-            fetchPost()
+            fetchPost() // 서버 데이터로 최종 동기화
         } catch (err) {
             console.error(err)
             alert("좋아요 처리에 실패했습니다.")
+            setPost(previousPost) // 실패 시 롤백
         }
     }
 
@@ -67,34 +86,57 @@ export default function PostDetailPage() {
             alert("로그인이 필요합니다.")
             return
         }
+
+        // Optimistic Update for Comment
+        const previousComments = [...comments]
+        setComments(prev => prev.map(c =>
+            c.id === commentId ? { ...c, likeCount: (c.likeCount || 0) + 1 } : c
+        ))
+
         try {
             await api.post(`/api/board/${postId}/comments/${commentId}/like`)
-            fetchComments()
+            fetchComments() // 서버 데이터로 최종 동기화
         } catch (err) {
             console.error(err)
             alert("댓글 좋아요 처리에 실패했습니다.")
+            setComments(previousComments) // 롤백
         }
     }
 
     const handleAddComment = async (e) => {
         e.preventDefault()
         if (!newComment.trim()) return
-
         if (!user) {
             alert("로그인이 필요합니다.")
             return
         }
 
+        // Optimistic UI: 사용자가 입력한 댓글 미리 보여주기 (임시 ID 사용)
+        const tempId = Date.now()
+        const optimisticComment = {
+            id: tempId,
+            content: newComment,
+            username: user.username || '나', // 현재 로그인한 유저 정보 활용
+            createdAt: new Date().toISOString(),
+            likeCount: 0
+        }
+
+        // 목록 끝에 추가 (기본 정렬이 과거->최신이라면)
+        setComments(prev => [...prev, optimisticComment])
+        const commentToSubmit = newComment
+        setNewComment('') // 입력창 초기화
+
         setCommentLoading(true)
         try {
             await api.post(`/api/board/${postId}/comments`, {
-                comment: newComment
+                comment: commentToSubmit
             })
-            setNewComment('')
-            fetchComments()
+            fetchComments() // 실제 데이터로 교체
         } catch (err) {
             console.error(err)
             alert("댓글 작성에 실패했습니다.")
+            setComments(prev => prev.filter(c => c.id !== tempId)) // 실패 시 제거
+            setNewComment(commentToSubmit) // 입력 내용 복구
         } finally {
             setCommentLoading(false)
         }

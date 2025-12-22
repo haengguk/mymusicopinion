@@ -135,15 +135,7 @@ export default function SongsPage() {
                             onChange={handleInput}
                             autoFocus
                         />
-                        {/* Old spinner removed, simplified */}
-                        <input
-                            type="text"
-                            className="w-full bg-transparent py-3 px-2 text-lg placeholder:text-slate-500 focus:outline-none"
-                            placeholder="검색어를 입력하세요..."
-                            value={searchTerm}
-                            onChange={handleInput}
-                            autoFocus
-                        />
+
                     </div>
                 </div>
 

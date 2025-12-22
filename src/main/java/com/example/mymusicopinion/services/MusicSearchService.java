@@ -44,7 +44,8 @@ public class MusicSearchService {
                             .path("/search")
                             .queryParam("term", term)
                             .queryParam("media", "music")
-                            .queryParam("limit", 100);
+                            .queryParam("country", "KR") // 노래 검색 정확도 향상 (한국 스토어 기준)
+                            .queryParam("limit", 200);
 
                     if ("song".equalsIgnoreCase(type)) {
                         uriBuilder.queryParam("attribute", "songTerm");
@@ -66,20 +67,8 @@ public class MusicSearchService {
         List<ItunesResponseDto.ItunesResultDto> results = response.getResults();
 
         // 수동 필터링 (후처리)
-        if (type != null && term != null) {
-            final String lowerTerm = term.toLowerCase();
-            if ("song".equalsIgnoreCase(type)) {
-                results = results.stream()
-                        .filter(r -> r.getTrackName() != null && r.getTrackName().toLowerCase().contains(lowerTerm))
-                        .collect(java.util.stream.Collectors.toList());
-                System.out.println("🧹 [Filter] 노래 제목으로 필터링됨. 남은 개수: " + results.size());
-            } else if ("artist".equalsIgnoreCase(type)) {
-                results = results.stream()
-                        .filter(r -> r.getArtistName() != null && r.getArtistName().toLowerCase().contains(lowerTerm))
-                        .collect(java.util.stream.Collectors.toList());
-                System.out.println("🧹 [Filter] 아티스트 이름으로 필터링됨. 남은 개수: " + results.size());
-            }
-        }
+        // 수동 필터링 (후처리) - 제거됨 (iTunes API attribute가 충분히 정확하며, 너무 엄격한 필터링이 결과를 제한함)
+        // if (type != null && term != null) { ... }
 
         // DB 통계로 데이터 보강
         try {

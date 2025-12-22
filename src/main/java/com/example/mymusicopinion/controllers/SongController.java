@@ -68,7 +68,7 @@ public class SongController {
     }
 
     @GetMapping("/{id}/reviews")
-    public Page<Review> getReviewBySongPaged(
+    public Page<com.example.mymusicopinion.dto.ReviewResponseDto> getReviewBySongPaged(
             @PathVariable("id") Long songId,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return reviewService.getReviewBySongId(songId, pageable);
