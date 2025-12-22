@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 
 @Service
+@org.springframework.transaction.annotation.Transactional(readOnly = true)
 public class PostService {
 
     private final PostRepository postRepository;
@@ -46,6 +47,7 @@ public class PostService {
         }
     }
 
+    @org.springframework.transaction.annotation.Transactional
     public Post addPost(PostRequestDto requestDto, User user) {
         Post post = new Post();
         post.setTitle(requestDto.getTitle());
@@ -86,6 +88,7 @@ public class PostService {
                 .orElseThrow(() -> new ResourceNotFoundException("해당 게시글이 없습니다"));
     }
 
+    @org.springframework.transaction.annotation.Transactional
     public void deletePostById(Long id) {
         if (!postRepository.existsById(id)) {
             throw new ResourceNotFoundException("해당 게시글이 없습니다.");
@@ -93,6 +96,7 @@ public class PostService {
         postRepository.deleteById(id);
     }
 
+    @org.springframework.transaction.annotation.Transactional
     public Post updatePostById(Long id, PostRequestDto postRequestDto) {
         Post existingPost = postRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("해당 게시글이 없습니다."));

@@ -183,10 +183,10 @@ public class DataInitializer implements CommandLineRunner {
 
             boolean isRecommend = random.nextBoolean();
             if (isRecommend) {
-                post.setCategory("RECOMMEND");
+                post.setCategory("RECOMMEND"); // 대문자 명시
                 post.setSong(songPool.get(random.nextInt(songPool.size())));
             } else {
-                post.setCategory("FREE");
+                post.setCategory("FREE"); // 대문자 명시
             }
 
             posts.add(post);

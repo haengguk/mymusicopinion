@@ -54,7 +54,7 @@ export default function PostWritePage() {
             const payload = {
                 title,
                 content,
-                category,
+                category: category.toUpperCase(), // 대문자 강제 변환 (DB 저장 시 "FREE", "RECOMMEND" 유지)
                 // Include song data if selected and category is RECOMMEND
                 ...(category === 'RECOMMEND' && selectedSong && {
                     itunesTrackId: selectedSong.trackId,

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@org.springframework.transaction.annotation.Transactional(readOnly = true)
 public class PostCommentService {
 
     private final PostRepository postRepository;
@@ -77,6 +78,7 @@ public class PostCommentService {
         return postCommentRepository.findByPostId(postId, pageable);
     }
 
+    @org.springframework.transaction.annotation.Transactional
     public PostComment updateComment(Long commentId, PostCommentRequestDto postCommentRequestDto) {
         PostComment comment = postCommentRepository.findById(commentId)
                 .orElseThrow(() -> new ResourceNotFoundException("해당 댓글이 없습니다."));
