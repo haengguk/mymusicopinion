@@ -69,9 +69,9 @@ public class SecurityConfig {
     public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
         org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
 
-        // 허용할 Origin 설정 (Vercel 배포 주소 + 로컬 개발용)
-        configuration.setAllowedOrigins(
-                java.util.Arrays.asList("https://mymusicopinion-fe.vercel.app", "http://localhost:3000",
+        // 허용할 Origin 설정 (Vercel 배포 주소 + 로컬 개발용 + 모든 Vercel 프리뷰)
+        configuration.setAllowedOriginPatterns(
+                java.util.Arrays.asList("https://*.vercel.app", "http://localhost:3000",
                         "http://localhost:5173", "http://localhost:5175"));
 
         // 허용할 HTTP Method 설정
