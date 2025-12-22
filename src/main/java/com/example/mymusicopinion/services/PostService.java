@@ -88,6 +88,12 @@ public class PostService {
                 .orElseThrow(() -> new ResourceNotFoundException("해당 게시글이 없습니다"));
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public PostResponseDto getPostResponseDtoById(Long id) {
+        Post post = getPostById(id);
+        return PostResponseDto.from(post);
+    }
+
     @org.springframework.transaction.annotation.Transactional
     public void deletePostById(Long id) {
         if (!postRepository.existsById(id)) {

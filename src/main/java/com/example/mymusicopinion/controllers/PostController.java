@@ -55,8 +55,7 @@ public class PostController {
 
     @GetMapping("/{id}")
     public ResponseEntity<com.example.mymusicopinion.dto.PostResponseDto> getPostById(@PathVariable("id") Long id) {
-        Post post = postService.getPostById(id);
-        return ResponseEntity.ok(com.example.mymusicopinion.dto.PostResponseDto.from(post));
+        return ResponseEntity.ok(postService.getPostResponseDtoById(id));
     }
 
     @DeleteMapping("/{id}")
