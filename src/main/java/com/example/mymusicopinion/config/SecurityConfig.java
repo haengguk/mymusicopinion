@@ -13,6 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.Arrays;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -27,63 +29,58 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // 비밀번호 암호화에 사용할 인코더를 BCrypt로 지정
-        // BCrypt 해싱 함수(BCrypt hashing function)를 사용해서 비밀번호를 인코딩해주는 메서드와 사용자의 의해 제출된
-        // 비밀번호와
-        // 저장소에 저장되어 있는 비밀번호의 일치 여부를 확인해주는 메서드를 제공
         return new BCryptPasswordEncoder();
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // CORS 설정 추가 (Security 필터 체인에서 가장 먼저 처리되도록)
+        // CORS 설정 추가
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
-        // CSRF(Cross-Site Request Forgery) 보호 비활성화 (JWT 사용 시 보통 비활성화)
+        // CSRF 비활성화
         http.csrf(csrf -> csrf.disable());
 
-        // 세션을 사용하지 않고, JWT를 통해 인증하므로 세션 정책을 STATELESS로 설정
+        // 세션 미사용 (Stateless)
         http.sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        // API 요청에 대한 접근 권한 설정
+        // API 접근 권한 설정
         http.authorizeHttpRequests(authz -> authz
-                // 정적 리소스에 대한 요청 모두 허용
+                // 정적 리소스 허용
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
 
-                // 회원가입, 로그인 API는 인증 없이 접근 허용
+                // 로그인 & 회원가입 API 허용
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/view/auth/**", "/songs/view", "/error", "/").permitAll()
-                // GET 요청 중에서 '/songs' 나 '/board' 로 시작하는 API는 인증
-                .requestMatchers(HttpMethod.GET, "/api/songs/**", "/api/board/**").permitAll()
+
+                // 조회용 API 허용 (GET) - 게시글 목록, 노래 목록 등
+                .requestMatchers(HttpMethod.GET, "/api/board/**", "/api/songs/**", "/api/posts/**").permitAll()
+
+                // View 관련 (혹시 사용한다면) 허용
+                .requestMatchers("/view/**", "/error", "/").permitAll()
+
+                // 그 외 모든 요청은 인증 필요
                 .anyRequest().authenticated());
 
         http.addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userRepository),
                 UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
-
     }
 
     @Bean
     public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
         org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
 
-        // 허용할 Origin 설정 (Vercel 배포 주소 + 로컬 개발용 + 모든 Vercel 프리뷰)
-        configuration.setAllowedOriginPatterns(
-                java.util.Arrays.asList("https://*.vercel.app", "http://localhost:3000",
-                        "http://localhost:5173", "http://localhost:5175"));
+        // 모든 Vercel 도메인 및 로컬 개발 환경 허용 (와일드카드 패턴 사용)
+        configuration.setAllowedOriginPatterns(Arrays.asList(
+                "https://*.vercel.app",
+                "http://localhost:3000",
+                "http://localhost:5173",
+                "http://localhost:5175"));
 
-        // 허용할 HTTP Method 설정
-        configuration.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-
-        // 허용할 Header 설정
-        configuration.setAllowedHeaders(java.util.Arrays.asList("*"));
-
-        // 자격 증명(Cookie, Authorization Header 등) 허용
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
-
-        // 노출할 헤더 설정 (JWT 사용 시 필요할 수 있음)
         configuration.addExposedHeader("Authorization");
 
         org.springframework.web.cors.UrlBasedCorsConfigurationSource source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();

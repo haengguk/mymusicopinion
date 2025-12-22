@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.concurrent.CompletableFuture;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
@@ -44,8 +44,20 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     @Override
-    @Transactional
     public void run(String... args) throws Exception {
+        // 비동기로 실행하여 메인 스레드(서버 부팅)를 막지 않음
+        CompletableFuture.runAsync(() -> {
+            try {
+                processInitialization();
+            } catch (Exception e) {
+                System.err.println("❌ [DataInitializer] 데이터 초기화 중 오류 발생: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
+    }
+
+    @Transactional
+    public void processInitialization() {
         if (userRepository.count() > 0) {
             System.out.println("🚀 [DataInitializer] 데이터가 이미 존재합니다. 초기화를 건너뜁니다.");
             return;
@@ -74,8 +86,6 @@ public class DataInitializer implements CommandLineRunner {
                     if (dto.getTrackId() == null)
                         continue;
 
-                    // iTunes가 다른 검색 쿼리에 대해 동일한 트랙을 반환하는 경우 풀에서 중복 방지
-                    // (가능성은 낮지만 안전하게 처리)
                     if (songPool.stream().anyMatch(s -> s.getItunesTrackId().equals(dto.getTrackId())))
                         continue;
 
@@ -87,7 +97,6 @@ public class DataInitializer implements CommandLineRunner {
                     song.setImageUrl(dto.getArtworkUrl100());
                     song.setGenre(dto.getPrimaryGenreName() != null ? dto.getPrimaryGenreName() : "Pop");
 
-                    // 발매 연도 추출을 위한 간단한 로직
                     if (dto.getReleaseDate() != null && dto.getReleaseDate().length() >= 4) {
                         try {
                             song.setReleaseYear(Integer.parseInt(dto.getReleaseDate().substring(0, 4)));
@@ -121,9 +130,6 @@ public class DataInitializer implements CommandLineRunner {
             user.setUsername("user" + i);
             user.setPassword(commonEncodedPassword);
             String nickname = adjectives[random.nextInt(adjectives.length)] + nouns[random.nextInt(nouns.length)] + i;
-            // User.java에 'username'이 있음. 'nickname' 필드는 1216 단계에서 확인되지 않음.
-            // ReviewResponseDto에는 'username'이 있음.
-            // bio를 무작위로 설정함.
             user.setBio("Hello, I am " + nickname);
             userPool.add(user);
         }

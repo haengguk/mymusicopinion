@@ -36,6 +36,6 @@ public class Post {
     @Column(nullable = false)
     private int likeCount = 0;
 
-    @org.hibernate.annotations.Formula("(select count(*) from post_comment pc where pc.post_id = id)")
+    @org.hibernate.annotations.Formula("(select count(*) from post_comments pc where pc.post_id = id)")
     private int commentCount;
 }
