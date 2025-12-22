@@ -56,7 +56,7 @@ public class DataInitializer implements CommandLineRunner {
         });
     }
 
-    @Transactional
+    // @Transactional // 제거: HTTP 요청이 포함된 긴 작업이므로 트랜잭션을 쪼갭니다.
     public void processInitialization() {
         if (userRepository.count() > 0) {
             System.out.println("🚀 [DataInitializer] 데이터가 이미 존재합니다. 초기화를 건너뜁니다.");
