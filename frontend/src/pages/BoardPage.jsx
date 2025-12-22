@@ -43,6 +43,7 @@ export default function BoardPage() {
             setHasMore(!isLast)
         } catch (error) {
             console.error("Failed to fetch posts", error)
+            setHasMore(false) // 에러 발생 시 추가 로딩 중단 (무한 루프 방지)
         } finally {
             setLoading(false)
         }

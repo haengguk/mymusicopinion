@@ -31,6 +31,7 @@ public class PostCommentService {
         this.postCommentLikeRepository = postCommentLikeRepository;
     }
 
+    @org.springframework.transaction.annotation.Transactional
     public PostComment addComment(Long postId, PostCommentRequestDto postCommentRequestDto,
             User user) {
         Post post = postRepository.findById(postId)
@@ -40,6 +41,11 @@ public class PostCommentService {
         comment.setPost(post);
         comment.setComment(postCommentRequestDto.getComment());
         comment.setUser(user);
+
+        post.setCommentCount(post.getCommentCount() + 1); // 댓글 수 증가
+        // postRepository.save(post); // Transactional이 없으면 명시적 저장 필요하지만, 여기선
+        // postCommentRepository.save와 별개이므로 저장 권장.
+        // 또는 메서드에 @Transactional 추가
 
         return postCommentRepository.save(comment);
     }
@@ -80,6 +86,7 @@ public class PostCommentService {
         return postCommentRepository.save(comment);
     }
 
+    @org.springframework.transaction.annotation.Transactional
     public void deleteComment(Long postId, Long commentId) {
         if (!postRepository.existsById(postId)) {
             throw new ResourceNotFoundException("해당 게시글이 없습니다.");
@@ -90,6 +97,9 @@ public class PostCommentService {
         if (!comment.getPost().getId().equals(postId)) {
             throw new BadRequestException("해당 게시글의 댓글이 아닙니다.");
         }
+
+        Post post = comment.getPost();
+        post.setCommentCount(Math.max(0, post.getCommentCount() - 1));
 
         postCommentRepository.deleteById(commentId);
     }
