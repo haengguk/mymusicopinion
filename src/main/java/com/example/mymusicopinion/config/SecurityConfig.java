@@ -55,7 +55,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/view/auth/**", "/songs/view", "/error", "/").permitAll()
                 // GET 요청 중에서 '/songs' 나 '/board' 로 시작하는 API는 인증
-                .requestMatchers(HttpMethod.GET, "/songs/**", "/board/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/songs/**", "/api/board/**").permitAll()
                 .anyRequest().authenticated());
 
         http.addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userRepository),
