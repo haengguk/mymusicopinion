@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
@@ -118,7 +119,7 @@ public class ReviewService {
         }
     }
 
-    public Page<Review> getAllReviews(Pageable pageable) {
-        return reviewRepository.findAll(pageable);
+    public Page<ReviewResponseDto> getAllReviews(Pageable pageable) {
+        return reviewRepository.findAll(pageable).map(ReviewResponseDto::from);
     }
 }

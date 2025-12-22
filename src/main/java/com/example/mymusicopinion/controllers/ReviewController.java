@@ -54,9 +54,8 @@ public class ReviewController {
 
         // Map Page<Review> to DTO if needed, or just return Page
         // ReviewResponseDto is cleaner
-        org.springframework.data.domain.Page<Review> reviews = reviewService.getAllReviews(pageable);
-        org.springframework.data.domain.Page<com.example.mymusicopinion.dto.ReviewResponseDto> dtoPage = reviews
-                .map(com.example.mymusicopinion.dto.ReviewResponseDto::from);
+        org.springframework.data.domain.Page<com.example.mymusicopinion.dto.ReviewResponseDto> dtoPage = reviewService
+                .getAllReviews(pageable);
 
         return ResponseEntity.ok(dtoPage);
     }

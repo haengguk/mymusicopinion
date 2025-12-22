@@ -25,6 +25,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 
 @Service
+@org.springframework.transaction.annotation.Transactional(readOnly = true)
 public class SongService {
     private final SongRepository songRepository;
     private final SongLikeRepository songLikeRepository;
