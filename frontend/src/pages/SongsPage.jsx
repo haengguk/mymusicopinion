@@ -36,7 +36,7 @@ export default function SongsPage() {
         setLoading(true)
         setVisibleLimit(20) // Reset pagination
         try {
-            const response = await api.get(`/music/search?term=${encodeURIComponent(term)}&type=${type}`)
+            const response = await api.get(`/api/music/search?term=${encodeURIComponent(term)}&type=${type}`)
             setResults(response.data)
         } catch (error) {
             console.error("Search failed", error)

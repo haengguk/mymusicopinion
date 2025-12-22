@@ -35,7 +35,7 @@ export default function BoardPage() {
         if (!isNewTab && loading) return // 중복 요청 방지
         setLoading(true)
         try {
-            const response = await api.get(`/board?category=${activeTab}&size=20&page=${pageNum}&sort=createdAt,desc`)
+            const response = await api.get(`/api/board?category=${activeTab}&size=20&page=${pageNum}&sort=createdAt,desc`)
             const newPosts = response.data.content
             const isLast = response.data.last
 

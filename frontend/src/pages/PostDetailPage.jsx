@@ -25,7 +25,7 @@ export default function PostDetailPage() {
 
     const fetchPost = async () => {
         try {
-            const res = await api.get(`/board/${postId}`)
+            const res = await api.get(`/api/board/${postId}`)
             setPost(res.data)
         } catch (err) {
             console.error(err)
@@ -37,7 +37,7 @@ export default function PostDetailPage() {
 
     const fetchComments = async () => {
         try {
-            const res = await api.get(`/board/${postId}/comments`)
+            const res = await api.get(`/api/board/${postId}/comments`)
             // Backend now uses /posts/{postId}/comments and returns Page<PostComment>
             // Need to check if it returns .content or raw list. Default Page returns .content
             setComments(res.data.content || res.data)
@@ -53,7 +53,7 @@ export default function PostDetailPage() {
             return
         }
         try {
-            await api.post(`/board/${postId}/like`)
+            await api.post(`/api/board/${postId}/like`)
             // Optimistic Update or Refetch
             fetchPost()
         } catch (err) {
@@ -68,7 +68,7 @@ export default function PostDetailPage() {
             return
         }
         try {
-            await api.post(`/board/${postId}/comments/${commentId}/like`)
+            await api.post(`/api/board/${postId}/comments/${commentId}/like`)
             fetchComments()
         } catch (err) {
             console.error(err)
@@ -87,7 +87,7 @@ export default function PostDetailPage() {
 
         setCommentLoading(true)
         try {
-            await api.post(`/board/${postId}/comments`, {
+            await api.post(`/api/board/${postId}/comments`, {
                 comment: newComment
             })
             setNewComment('')

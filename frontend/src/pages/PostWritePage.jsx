@@ -30,7 +30,7 @@ export default function PostWritePage() {
 
         setSearchLoading(true)
         try {
-            const res = await api.get(`/music/search?term=${encodeURIComponent(searchQuery)}`)
+            const res = await api.get(`/api/music/search?term=${encodeURIComponent(searchQuery)}`)
             setSearchResults(res.data)
         } catch (err) {
             console.error(err)
@@ -65,7 +65,7 @@ export default function PostWritePage() {
                 })
             }
 
-            await api.post('/board', payload)
+            await api.post('/api/board', payload)
             navigate('/board')
         } catch (err) {
             console.error(err)
@@ -99,8 +99,8 @@ export default function PostWritePage() {
                                 type="button"
                                 onClick={() => { setCategory('FREE'); setSelectedSong(null); }}
                                 className={`flex-1 py-3 rounded-xl border font-bold transition-all ${category === 'FREE'
-                                        ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-500/20'
-                                        : 'bg-slate-900 border-slate-700 text-slate-400 hover:bg-slate-800'
+                                    ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-500/20'
+                                    : 'bg-slate-900 border-slate-700 text-slate-400 hover:bg-slate-800'
                                     }`}
                             >
                                 자유게시판
@@ -109,8 +109,8 @@ export default function PostWritePage() {
                                 type="button"
                                 onClick={() => setCategory('RECOMMEND')}
                                 className={`flex-1 py-3 rounded-xl border font-bold transition-all ${category === 'RECOMMEND'
-                                        ? 'bg-pink-600 border-pink-500 text-white shadow-lg shadow-pink-500/20'
-                                        : 'bg-slate-900 border-slate-700 text-slate-400 hover:bg-slate-800'
+                                    ? 'bg-pink-600 border-pink-500 text-white shadow-lg shadow-pink-500/20'
+                                    : 'bg-slate-900 border-slate-700 text-slate-400 hover:bg-slate-800'
                                     }`}
                             >
                                 노래 추천

@@ -25,7 +25,7 @@ export default function ProfilePage() {
 
     const fetchUserInfo = async () => {
         try {
-            const res = await api.get('/users/me')
+            const res = await api.get('/api/users/me')
             setUserInfo({
                 username: res.data.username,
                 bio: res.data.bio || ''
@@ -40,8 +40,8 @@ export default function ProfilePage() {
     const fetchMyActivity = async () => {
         try {
             const [reviewsRes, postsRes] = await Promise.all([
-                api.get('/users/me/reviews'),
-                api.get('/users/me/posts')
+                api.get('/api/users/me/reviews'),
+                api.get('/api/users/me/posts')
             ])
             setMyReviews(reviewsRes.data)
             setMyPosts(postsRes.data)
@@ -55,7 +55,7 @@ export default function ProfilePage() {
         setMessage({ type: '', text: '' })
 
         try {
-            await api.put('/users/me', {
+            await api.put('/api/users/me', {
                 bio: userInfo.bio,
                 password: password || undefined
             })

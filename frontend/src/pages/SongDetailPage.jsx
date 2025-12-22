@@ -79,14 +79,14 @@ export default function SongDetailPage() {
             })
 
             try {
-                const songRes = await api.get(`/songs/itunes/${itunesTrackId}`)
+                const songRes = await api.get(`/api/songs/itunes/${itunesTrackId}`)
                 dbSong = mapSongData(songRes.data)
             } catch (err) {
                 // 404인 경우, 로컬 전용 노래 ID일 수 있음 (정크 데이터 또는 수동 입력)
                 // 기본 키 ID로 가져오기 시도
                 console.warn("Failed to fetch by iTunes ID, trying DB ID...", err)
                 try {
-                    const fallbackRes = await api.get(`/songs/${itunesTrackId}`)
+                    const fallbackRes = await api.get(`/api/songs/${itunesTrackId}`)
                     dbSong = mapSongData(fallbackRes.data)
                 } catch (fallbackErr) {
                     console.error("Failed to fetch song by DB ID also", fallbackErr)
@@ -99,7 +99,7 @@ export default function SongDetailPage() {
 
                 // 로그인한 경우 상태 가져오기
                 if (user) {
-                    const statusRes = await api.get(`/songs/${dbSong.id}/status`)
+                    const statusRes = await api.get(`/api/songs/${dbSong.id}/status`)
                     setStatus(statusRes.data)
                 }
             } else {
@@ -118,12 +118,12 @@ export default function SongDetailPage() {
             // 올바른 DB ID 확인 시도
             try {
                 // 먼저 iTunes ID로 시도
-                const songRes = await api.get(`/songs/itunes/${itunesTrackId}`)
+                const songRes = await api.get(`/api/songs/itunes/${itunesTrackId}`)
                 songId = songRes.data.id
             } catch (err) {
                 // 대체: DB ID일 수 있음
                 try {
-                    const fallbackRes = await api.get(`/songs/${itunesTrackId}`)
+                    const fallbackRes = await api.get(`/api/songs/${itunesTrackId}`)
                     songId = fallbackRes.data.id
                 } catch (fallbackErr) {
                     console.error("Could not resolve song ID for reviews", fallbackErr)
@@ -132,7 +132,7 @@ export default function SongDetailPage() {
 
             if (songId) {
                 // 정렬과 함께 가져오기
-                const reviewResponse = await api.get(`/reviews?songId=${songId}&sort=${reviewSort}`)
+                const reviewResponse = await api.get(`/api/reviews?songId=${songId}&sort=${reviewSort}`)
                 const fetchedReviews = reviewResponse.data.content || reviewResponse.data
                 setReviews(fetchedReviews)
 
@@ -161,7 +161,7 @@ export default function SongDetailPage() {
         }
 
         try {
-            const res = await api.get(`/music/youtube-video?term=${encodeURIComponent(queryTerm)}`)
+            const res = await api.get(`/api/music/youtube-video?term=${encodeURIComponent(queryTerm)}`)
             if (res.data && res.data.videoId) {
                 setVideoId(res.data.videoId)
             }
@@ -181,9 +181,9 @@ export default function SongDetailPage() {
         if (!user) return alert('로그인이 필요합니다.')
         try {
             // DB ID 필요
-            const songRes = await api.get(`/songs/itunes/${itunesTrackId}`)
+            const songRes = await api.get(`/api/songs/itunes/${itunesTrackId}`)
             const songId = songRes.data.id
-            await api.post(`/songs/${songId}/like`)
+            await api.post(`/api/songs/${songId}/like`)
 
             // 낙관적 업데이트 (Optimistic update)
             setLikeCount(prev => status.liked ? prev - 1 : prev + 1)
@@ -196,9 +196,9 @@ export default function SongDetailPage() {
     const handleToggleFavorite = async () => {
         if (!user) return alert('로그인이 필요합니다.')
         try {
-            const songRes = await api.get(`/songs/itunes/${itunesTrackId}`)
+            const songRes = await api.get(`/api/songs/itunes/${itunesTrackId}`)
             const songId = songRes.data.id
-            await api.post(`/songs/${songId}/favorite`)
+            await api.post(`/api/songs/${songId}/favorite`)
 
             setStatus(prev => ({ ...prev, favorited: !prev.favorited }))
         } catch (error) {
@@ -209,7 +209,7 @@ export default function SongDetailPage() {
     const handleToggleReviewLike = async (reviewId) => {
         if (!user) return alert('로그인이 필요합니다.')
         try {
-            await api.post(`/reviews/${reviewId}/like`)
+            await api.post(`/api/reviews/${reviewId}/like`)
             fetchReviews() // 카운트 업데이트를 위해 새로고침
         } catch (error) {
             console.error("Review like failed", error)
@@ -244,7 +244,7 @@ export default function SongDetailPage() {
         }
 
         try {
-            await api.post('/reviews', payload)
+            await api.post('/api/reviews', payload)
             setShowReviewForm(false)
             setComment('')
             setStatus(prev => ({ ...prev, reviewed: true }))

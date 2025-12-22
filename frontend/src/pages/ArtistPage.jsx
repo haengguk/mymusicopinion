@@ -18,8 +18,8 @@ export default function ArtistPage() {
             try {
                 // 병렬 페칭 (Parallel fetch)
                 const [tracksRes, albumsRes] = await Promise.all([
-                    api.get(`/artists/${artistName}/top-tracks`),
-                    api.get(`/artists/${artistName}/albums`)
+                    api.get(`/api/artists/${artistName}/top-tracks`),
+                    api.get(`/api/artists/${artistName}/albums`)
                 ])
 
                 setTopTracks(tracksRes.data)

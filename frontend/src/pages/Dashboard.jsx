@@ -20,8 +20,8 @@ export default function Dashboard() {
                 // Fetch Songs (8 items for grid/carousel look)
                 // Fetch Reviews (Top 3 popular)
                 const [songsRes, reviewsRes] = await Promise.all([
-                    api.get('/songs?size=8&sort=id,desc&hasReviews=true'),
-                    api.get('/reviews?size=3&sort=likeCount,desc')
+                    api.get('/api/songs?size=8&sort=id,desc&hasReviews=true'),
+                    api.get('/api/reviews?size=3&sort=likeCount,desc')
                 ])
                 // Filter out songs without iTunes ID (likely test/junk data) to keep dashboard clean
                 const cleanSongs = songsRes.data.content.filter(song => song.itunesTrackId)
